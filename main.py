@@ -3,10 +3,14 @@ import sys
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib
+from numba import jit
+from pandas.core.arrays.sparse import dtype
 # Dimensionality reduction
 import tensorflow as tf
 from sklearn.decomposition import PCA
 from sklearn.manifold import Isomap
+
 # Clustering
 from sklearn.cluster import DBSCAN
 from sklearn.cluster import Birch
@@ -18,17 +22,17 @@ def init():
     print("Python version: ", sys.version[:7])
 
 def data(name, num):
-        df = pd.read_hdf(f'data/{name}_{num}.h5')
+        df = pd.read_hdf(f'{name}_{num}.h5')
         return df
 
 def dreduct(method,name,num):
     if method=='PCA':
         pca = PCA(n_components=2)
         X = data(name,num)
-        pca.fit(X)
+        pcs = pca.fit_transform(X)
         print("Principal Component accuracy: ",sum(pca.explained_variance_ratio_))
         # print(pca.singular_values_)
-        return pca.singular_values_
+        return pcs
     elif method=='Isomap':
         embedding = Isomap(n_components=2)
         X = data(name,num)
@@ -37,31 +41,54 @@ def dreduct(method,name,num):
         return X_transformed
     else:
         raise ValueError('A very specific bad thing happened. (incorrectly specified DATA REDUCTION method)')
-
-def clustering(method,name,num):
+        
+def clustering(method,X):
     if method == 'K-means':
-        X = data(name,num)
-        kmeans = KMeans(n_clusters=2, random_state=42).fit(X)
+        kmeans = KMeans(n_clusters=6, random_state=42).fit(X)
         print('clustering complete')
         return kmeans.labels_
     elif method=='DBSCAN':
-        X = data(name,num)
         clustering = DBSCAN(eps=3, min_samples=2).fit(X)
         print('DBSCAN clustering complete')
         return clustering.labels_
     elif method=='BIRCH':
         brc = Birch(n_clusters=None)
-        X = data(name,num)
-        labels = brc.fit_predict(X)
+        brc.fit(X)
+        labels = brc.predict(X)
         print('BIRCH clustering complete')
         return labels
     else:
         raise ValueError('A very specific bad thing happened. (incorrectly specified CLUSTERING method)')
 
-def graph(X):
-    
-    pass
+def graph(X,labels,title):
+    fig, ax = plt.subplots()
+    for label in np.unique(labels):
+        i = np.where(labels == label)
+        ax.scatter(X[i,0], X[i,1], label=label,marker='.',s=1)
+    # ax.legend()
+    # plt.scatter(X[:,0],X[:,1],c=labels,s=1)
+    plt.title(title[0])
+    plt.xlabel(title[1])
+    plt.ylabel(title[2])
+    plt.show()
+    # plt.savefig('fig1.png')
+
 
 if __name__ == "__main__":
     init()
-dreduct('PCA','c2d_data','1')
+
+# X = dreduct('PCA','data/c2d_data','1')
+# labels = clustering('K-means',X)
+# graph(X,labels,['Title','x_label','y_label'])
+
+def OmegaDataset(foldername,filename):
+    X = np.array([])
+    for i in range(55):
+        Y = pd.read_hdf(f'{foldername}/{filename}{i}.h5').to_numpy()
+        X = np.append(X,Y)
+    X = np.reshape(X,(-1,20))
+    # print(X.shape,X[:76682]==data('data/c2d_data','0'))
+    pd.DataFrame(X).to_hdf("OmegaData.h5",index=False,key="d2c")
+
+# OmegaDataset('~/Rats/data','c2d_data_')
+
