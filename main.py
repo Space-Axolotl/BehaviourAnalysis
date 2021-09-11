@@ -22,7 +22,7 @@ def init():
     print("Python version: ", sys.version[:7])
 
 def data(name, num):
-        df = pd.read_hdf(f'{name}_{num}.h5')
+        df = pd.read_hdf(f'{name}_{num}.h5').to_numpy()[:200000]
         return df
 
 def dreduct(method,name,num):
@@ -70,14 +70,14 @@ def graph(X,labels,title):
     plt.title(title[0])
     plt.xlabel(title[1])
     plt.ylabel(title[2])
-    plt.show()
-    # plt.savefig('fig1.png')
+    # plt.show()
+    plt.savefig(f'{title[0]}{title[1]}.png')
 
 
 if __name__ == "__main__":
     init()
 
-# X = dreduct('PCA','data/c2d_data','1')
+# X = dreduct('Isomap','data/c2d_data','1')
 # labels = clustering('K-means',X)
 # graph(X,labels,['Title','x_label','y_label'])
 
@@ -92,3 +92,11 @@ def OmegaDataset(foldername,filename):
 
 # OmegaDataset('~/Rats/data','c2d_data_')
 
+def experiments():
+    exlist = [['PCA','K-means'],['PCA','DBSCAN']]
+    for i in exlist:
+        print(i[0])
+        X = dreduct(f'{i[0]}','OmegaData','0')
+        labels = clustering(f'{i[1]}',X)
+        graph(X,labels,[f'{i[0]}',f'{i[1]}','centered data'])
+experiments()
