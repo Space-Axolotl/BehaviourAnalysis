@@ -99,4 +99,5 @@ def experiments():
         X = dreduct(f'{i[0]}','OmegaData','0')
         labels = clustering(f'{i[1]}',X)
         graph(X,labels,[f'{i[0]}',f'{i[1]}','centered data'])
-experiments()
+
+# experiments()
