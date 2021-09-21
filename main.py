@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib
-from numba import jit
 from pandas.core.arrays.sparse import dtype
 # Dimensionality reduction
 import tensorflow as tf
