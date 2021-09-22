@@ -3,6 +3,12 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
+import numba
+from numba import njit 
+
+def init():
+    return 0
+
 def prep_data(name):
     x = pd.read_hdf(f'data/raw/{name}')
     x.columns = x.columns.droplevel()
@@ -24,8 +30,6 @@ def prep_data(name):
     # print(names)
     # print(out.shape)
     return out
-
-x = prep_data('2d_2_top.h5')
 
 def plotall():
     for i in range(0,20,2):
@@ -49,7 +53,29 @@ def animate():
     animation = FuncAnimation(fig, func=animation, interval=12)
     plt.show()
 
-# check how many points are in (-1,-1) 
-# == 120419 this is 9,263% of datapoints 
+def speed():
+    new=np.array([x[0]])
+    for i in range(x.shape[0]):
+        r=True
+        for j in range(0,20,2):
+            if x[i][j] < 0 and x[i][j+1] < 0:
+                r=False
+        if r == True:
+            new = np.append(new,[x[i]],0)
+
+    print(new.shape)
+    pd.DataFrame(new).to_hdf("~/BehaviourAnalysis/data/forffn/2d_ffn_1bot.h5",index=False,key="d2")
+
+
+if __name__== '__main__':
+    init()
+    x = prep_data('2d_1_bot.h5')
+    # speed()
+    # plotall()
+    # animate()
+
+
 # minusone = x == -1
 # print(minusone.sum())
+# check how many points are in (-1,-1) 
+# == 120419 this is 9,263% of datapoints 
