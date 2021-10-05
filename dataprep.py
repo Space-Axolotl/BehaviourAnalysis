@@ -27,8 +27,8 @@ def prep_data(name):
             out = arr
         else:
             out = np.concatenate((out, arr), axis=1)
-    # print(names)
-    # print(out.shape)
+    print(names)
+    print(out.shape)
     return out
 
 def plotall():
@@ -39,18 +39,18 @@ def plotall():
 def animate():
     fig = plt.figure()
     ax = fig.add_subplot(1,1,1)
-    ax.set_xlim([500,855])
-    ax.set_ylim([100,555])
-
+    ax.set_xlim([0,1])
+    ax.set_ylim([0,1])
+    x = pd.read_hdf('data/clean/2d_c_top1.h5').to_numpy()
     def animation(i):
-        x = prep_data('2d_2_top.h5')
+        
         ax.clear()
-        ax.set_xlim([500,855])
-        ax.set_ylim([100,555])
+        ax.set_xlim([0,1])
+        ax.set_ylim([0,1])
         for j in range(0,20,2):
             ax.scatter(x[i,j],x[i,j+1],s=15)
 
-    animation = FuncAnimation(fig, func=animation, interval=12)
+    animation = FuncAnimation(fig, func=animation, interval=0.0001)
     plt.show()
 
 def speed():
@@ -69,9 +69,10 @@ def speed():
 
 if __name__== '__main__':
     init()
-    x = prep_data('2d_1_bot.h5')
+    # x = prep_data('2d_1_top.h5')
+    x = pd.read_hdf('data/clean/2d_c_top1.h5').to_numpy()
     # speed()
-    # plotall()
+    plotall()
     # animate()
 
 
